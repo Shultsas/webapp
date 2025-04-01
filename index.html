@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уютный Чат</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6D8B89;
+            --secondary: #D4A59A;
+            --accent: #C8C6A7;
+            --text: #3A3226;
+            --light: #F5F0E6;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(circle at 10% 20%, rgba(245,240,230,0.9) 0%, rgba(245,240,230,0.8) 90%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(58,50,38,0.1);
+            animation: fadeIn 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            text-align: center;
+            margin: 0 0 25px 0;
+            color: var(--primary);
+            font-weight: 700;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        .description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: fadeIn 0.8s ease-out 0.6s both;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: var(--text);
+        }
+
+        .btn-light {
+            background-color: var(--light);
+            color: var(--text);
+            border: 1px solid var(--accent);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать</h1>
+        
+        <p class="description">
+            Это уютное пространство для общения с искуственным интеллектом. 
+            Задавайте вопросы, обсуждайте идеи или просто поболтайте — 
+            я всегда рад помочь!
+        </p>
+        
+        <div class="btn-container">
+            <button class="btn btn-primary" id="chatBtn">
+                <span class="icon">💬</span> Поговорим?
+            </button>
+            
+            <button class="btn btn-secondary" id="infoBtn">
+                <span class="icon">❓</span> Что это такое?
+            </button>
+            
+            <button class="btn btn-accent" id="devBtn">
+                <span class="icon">👨‍💻</span> Написать разработчику
+            </button>
+            
+            <button class="btn btn-light" id="exitBtn">
+                <span class="icon">🚪</span> Выйти
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Обработчики кнопок
+        document.getElementById('chatBtn').addEventListener('click', () => {
+            tg.showAlert("Сейчас откроется чат с нейросетью...", () => {
+                // Простейшая интеграция без БД - отправка сообщения боту
+                tg.sendData(JSON.stringify({
+                    action: "start_chat",
+                    user_id: tg.initDataUnsafe.user?.id
+                }));
+            });
+        });
+        
+        document.getElementById('infoBtn').addEventListener('click', () => {
+            tg.showAlert(`
+Это чат-бот с искуственным интеллектом. Вот что я умею:
+
+• Отвечать на вопросы
+• Помогать с идеями
+• Общаться на разные темы
+• Решать простые задачи
+
+Просто начните диалог кнопкой "Поговорим?"!
+            `);
+        });
+        
+        document.getElementById('devBtn').addEventListener('click', () => {
+            tg.openTelegramLink('https://t.me/sosisoso4ek');
+        });
+        
+        document.getElementById('exitBtn').addEventListener('click', () => {
+            tg.close();
+        });
+
+        // Анимация при наведении на иконки
+        const icons = document.querySelectorAll('.icon');
+        icons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                icon.style.animation = 'float 1.5s ease-in-out infinite';
+            });
+            icon.addEventListener('mouseleave', () => {
+                icon.style.animation = 'float 3s ease-in-out infinite';
+            });
+        });
+    </script>
+</body>
+</html>
